@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="gold">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LUNA · IA de Mercado</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#030812;--card:#0a1830a8;--bd:#1b3358;--tx:#dbe9ff;--mu:#7f9bc0;--acc:#e6b450;--blue:#38bdf8;--g:#34ffb0;--r:#ff5470;--y:#ffd24a;--pu:#d946ef;--gr:#8aa0b8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+[data-theme=blue]{--acc:#38bdf8}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 20% 0,#0a2a55 0,var(--bg) 55%) fixed;color:var(--tx);font:15px/1.55 Inter,system-ui,sans-serif;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(0deg,#38bdf806 0 1px,transparent 1px 3px);pointer-events:none}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;max-width:1400px;margin:auto;padding:14px 16px}
+.logo{font:800 20px Orbitron,sans-serif;letter-spacing:.22em}.logo b{color:var(--acc);text-shadow:0 0 14px var(--acc)}.logo small{display:block;font:400 10px Inter;letter-spacing:.25em;color:var(--mu)}
+nav{display:flex;gap:6px}nav button{width:auto;margin:0;padding:8px 14px;font:600 12px Orbitron,sans-serif;letter-spacing:.1em;background:none;border:1px solid var(--bd);color:var(--mu);box-shadow:none;cursor:pointer}
+nav button.on{color:var(--acc);border-color:var(--acc)}
+.chips{display:flex;gap:8px;font-size:12px;color:var(--mu)}.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:99px;padding:4px 10px}.dot{width:8px;height:8px;border-radius:50%;background:var(--gr)}.dot.ok{background:var(--g);box-shadow:0 0 8px var(--g)}.dot.bad{background:var(--r)}
+main{max-width:1400px;margin:auto;padding:0 16px 16px}
+.view{display:none;animation:f .45s ease}.view.on{display:block}
+@keyframes f{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.stage{display:grid;grid-template-columns:minmax(250px,1fr) minmax(0,1.6fr) minmax(270px,1fr);gap:14px;align-items:stretch;height:calc(100vh - 175px);min-height:520px}@media(max-width:1000px){.stage{grid-template-columns:1fr;height:auto}.center{order:-1}}.col{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}.center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.obs{font-size:15px;line-height:1.5}.eb{border-top:1px solid var(--bd);padding:10px 0;font-size:13px;font-variant-numeric:tabular-nums}.eb b{font:600 14px Orbitron,sans-serif;letter-spacing:.08em}.eb div{margin-top:3px}
+.entry{font-weight:600;font-size:clamp(16px,1.8vw,22px);line-height:1.3;color:var(--acc);text-shadow:0 0 14px #e6b45055}.entry.mu{color:var(--mu);text-shadow:none;font-size:15px;font-weight:400}
+#orbwrap{position:relative;width:100%;max-width:min(100%,calc(100vh - 240px));aspect-ratio:1;margin:0 auto}canvas{width:100%;height:100%;display:block}
+#status{text-align:center;min-height:56px;margin-top:2px}
+#st1{font:800 clamp(18px,4.4vw,30px) Orbitron,sans-serif;letter-spacing:.07em;text-shadow:0 0 16px currentColor;transition:color .6s}#st2{font-size:12px;color:var(--mu);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;backdrop-filter:blur(10px);box-shadow:0 0 30px #38bdf80d,inset 0 0 20px #38bdf806}
+h2{margin:0 0 10px;font:600 13px Orbitron,sans-serif;letter-spacing:.14em;color:var(--acc)}
+label{display:block;font-size:11px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+input,select{width:100%;background:#050d1d;color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:9px;font:inherit}input[type=range]{padding:0}
+.g2{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:520px){.g2{grid-template-columns:1fr 1fr}}
+.drop{display:block;border:1.5px dashed #2a5a95;border-radius:12px;padding:14px;text-align:center;cursor:pointer;color:#a9c4e8;margin-top:12px;transition:.3s;font-size:14px}.drop.on,.drop:hover{border-color:var(--acc);box-shadow:0 0 20px #e6b45033}
+.pv-wrap{position:relative;margin-top:12px}
+img.pv{width:100%;max-height:140px;object-fit:cover;display:block;border-radius:10px;border:1px solid var(--bd);cursor:zoom-in}
+.pv-overlay{position:absolute;inset:0;pointer-events:none;border-radius:10px;overflow:hidden}
+.mira-dot{position:absolute;width:16px;height:16px;border:2px solid var(--acc);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--acc);animation:pulse-mira 1.5s infinite}
+@keyframes pulse-mira{0%{transform:translate(-50%,-50%) scale(0.8);opacity:1}50%{transform:translate(-50%,-50%) scale(1.4);opacity:0.4}100%{transform:translate(-50%,-50%) scale(0.8);opacity:1}}
+button{font:600 13px Orbitron,sans-serif;letter-spacing:.1em;cursor:pointer;border:1px solid var(--acc);border-radius:12px;padding:12px;background:linear-gradient(90deg,#0b2d5c,#0c4a7a);color:#fff;width:100%;margin-top:12px;box-shadow:0 0 18px #e6b45033;transition:.25s}
+button:hover:not(:disabled){box-shadow:0 0 30px #e6b45088}button:disabled{opacity:.35;cursor:default;box-shadow:none}
+button.sm{width:auto;margin:0;padding:6px 10px;font-size:11px;background:none;border-color:var(--bd);color:var(--tx);box-shadow:none}button.sm:hover:not(:disabled){border-color:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.fav{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}.fav span{cursor:pointer;border:1px solid var(--bd);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--mu)}.fav span:hover{color:var(--acc);border-color:var(--acc)}
+.err{color:var(--r);font-size:13px}.warn{color:var(--y);font-size:13px}.mu{color:var(--mu);font-size:12px}
+.h{display:flex;gap:10px;align-items:center;border-top:1px solid var(--bd);padding:10px 0}.h img{width:84px;height:56px;object-fit:cover;border-radius:6px}.h .t{flex:1;font-size:13px}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}.sw input{width:auto}
+#bar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#050d1dee;backdrop-filter:blur(12px);border-top:1px solid var(--bd);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+#bar label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px}#bar input[type=range]{width:80px}
+.eq{display:flex;gap:3px;align-items:flex-end;height:20px}.eq i{width:4px;height:4px;background:var(--acc);border-radius:2px}body.spk .eq i{animation:eq .7s infinite ease-in-out}body.spk .eq i:nth-child(2){animation-delay:.15s}body.spk .eq i:nth-child(3){animation-delay:.3s}body.spk .eq i:nth-child(4){animation-delay:.45s}@keyframes eq{50%{height:20px}}
+#vstate{font-size:12px;color:var(--mu);min-width:80px}
+#zoom{position:fixed;inset:0;background:#000f;overflow:auto;padding:20px;display:none;z-index:30;text-align:center}
+#zoom .z-wrap{position:relative;display:inline-block;max-width:95%}
+#zoom img{max-width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--bd)}
+.badge-exp{display:inline-block;background:#0f2744;border:1px solid var(--acc);color:var(--acc);padding:4px 10px;border-radius:8px;font:600 12px Orbitron;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">LUNA <b>·</b> IA<small>INTELIGÊNCIA ARTIFICIAL DE MERCADO</small></div>
+ <nav><button class="on" data-v="analise">ANÁLISE</button><button data-v="historico">HISTÓRICO</button><button data-v="config">CONFIG</button></nav>
+ <div class="chips">
+  <span class="chip"><i class="dot" id="dIA"></i><span id="tIA">IA</span></span>
+  <span class="chip"><i class="dot" id="dV"></i><span id="tV">Voz</span></span>
+ </div>
+</header>
+<div id="toasts"></div>
+<main>
+<section class="view on" id="v-analise">
+ <div class="stage">
+  <aside class="col">
+   <div class="card">
+    <h2>OBSERVAÇÃO DA IA</h2>
+    <div id="obs" class="obs mu">Envie um print do gráfico e clique em escanear para análise de posições e tempo de opção.</div>
+   </div>
+   <div class="card">
+    <h2>POSSÍVEL ENTRADA & OPÇÕES</h2>
+    <div id="entry" class="entry mu">—</div>
+    <div id="expBadge"></div>
+    <div id="entries"></div>
+   </div>
+  </aside>
+  <div class="center">
+   <div id="orbwrap"><canvas id="cv"></canvas></div>
+   <div id="status"><div id="st1"></div><div id="st2"></div></div>
+  </div>
+  <aside class="col right">
+   <div class="card">
+    <h2>ENVIAR GRÁFICO (PRINT)</h2>
+    <div class="g2">
+     <div><label>Ativo</label><input id="asset" list="assets" placeholder="GOLD, EUR/USD..."><datalist id="assets"><option>GOLD</option><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>BTC/USD</option><option>WIN</option><option>WDO</option></datalist></div>
+     <div><label>Timeframe</label><select id="tf"><option value="">Detectar no print</option><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option></select></div>
+     <div><label>Tipo</label><select id="mkt"><option>Opções Binárias / IQ</option><option>Forex</option><option>Índice</option><option>Criptomoedas</option></select></div>
+    </div>
+    <div class="fav" id="favs"></div>
+    <label class="drop" id="drop">Arraste o print aqui, cole (Ctrl+V) ou toque (PNG/JPG)<input id="file" type="file" accept="image/png,image/jpeg" hidden></label>
+    <div id="fileinfo" class="mu" style="margin-top:6px"></div>
+    <div class="pv-wrap" id="pvWrap" hidden>
+     <img id="pv" class="pv" alt="prévia">
+     <div class="pv-overlay" id="pvOverlay"></div>
+    </div>
+    <div class="row" id="imgbtns" hidden>
+     <button class="sm" id="bZoom">🔍 Ampliar com Mira</button>
+     <button class="sm" id="bRep">⟲ Substituir</button>
+     <button class="sm" id="bDel">✕ Remover</button>
+    </div>
+    <button id="go" disabled>ESCANEAR GRÁFICO & CALCULAR TEMPO</button>
+    <p id="err" class="err"></p>
+   </div>
+   <div class="card">
+    <h2>RESULTADO & FEEDBACK</h2>
+    <div class="row" style="margin-top:0">
+     <button class="sm" id="bWin" style="border-color:var(--g);color:var(--g)">✔ GANHOU</button>
+     <button class="sm" id="bLoss" style="border-color:var(--r);color:var(--r)">✘ NÃO GANHOU</button>
+     <button class="sm" id="bNoRes">limpar</button>
+    </div>
+    <div id="fbState" class="mu" style="margin-top:6px"></div>
+   </div>
+  </aside>
+ </div>
+</section>
+<section class="view" id="v-historico">
+ <div class="card">
+  <h2>HISTÓRICO E ESTATÍSTICAS</h2>
+  <div id="stats" class="mu"></div>
+  <div id="hist"></div>
+  <div class="row"><button class="sm" id="bClear">Apagar todo o histórico</button></div>
+ </div>
+</section>
+<section class="view" id="v-config">
+ <div class="card">
+  <h2>CONFIGURAÇÕES</h2>
+  <div id="voicewarn" class="warn" hidden></div>
+  <label>Voz feminina (pt-BR)</label><select id="sVoice"></select>
+  <div class="row"><button class="sm" id="bTest">▶ Testar voz</button></div>
+  <label style="margin-top:12px">Velocidade da fala</label><input class="rate" type="range" min=".7" max="1.4" step=".05">
+  <label style="margin-top:12px">Volume</label><input id="sVol" type="range" min="0" max="1" step=".05">
+  <div class="sw"><span>Leitura automática após escanear</span><input type="checkbox" id="sAuto"></div>
+  <div class="sw"><span>Alertas sonoros</span><input type="checkbox" id="sBeep"></div>
+  <div class="g2" style="margin-top:12px">
+   <div><label>Tema</label><select id="sTheme"><option value="gold">Dourado</option><option value="blue">Azul elétrico</option></select></div>
+  </div>
+ </div>
+</section>
+</main>
+<div id="zoom">
+ <div class="z-wrap">
+  <img id="zimg" alt="ampliada">
+  <div class="pv-overlay" id="zOverlay"></div>
+ </div>
+ <div style="margin-top:12px"><button class="sm" id="bCloseZoom" style="background:#0b2d5c">Fechar Zoom</button></div>
+</div>
+<div id="bar">
+ <div class="eq"><i></i><i></i><i></i><i></i></div><span id="vstate">Luna em silêncio</span>
+ <button class="sm" id="bVoice">🔊 Voz ativada</button><button class="sm" id="bPlay">▶ Reproduzir</button><button class="sm" id="bPause">⏸ Pausar</button><button class="sm" id="bRepeat">↻ Repetir</button><button class="sm" id="bStop">■ Parar</button>
+</div>
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ST={NAO_ENTRE_AGORA:["NÃO ENTRE AGORA","var(--r)","NAO",355],AGUARDANDO_CONFIRMACAO:["AGUARDE CONFIRMAÇÃO","var(--y)","AGU",45],POSSIVEL_ENTRADA:["","", "",0],ENTRADA_CONFIRMADA:["","","",0]};
+let S={voice:"",rate:1,vol:1,auto:true,beep:true,fav:["GOLD","EUR/USD","BTC/USD","WIN"],tf:"M1",mkt:"Opções Binárias / IQ",theme:"gold",voiceOn:true};
+try{Object.assign(S,JSON.parse(localStorage.getItem("luna_cfg")||"{}"))}catch(e){}
+const saveS=()=>{try{localStorage.setItem("luna_cfg",JSON.stringify(S))}catch(e){}};
+function applyS(){document.documentElement.dataset.theme=S.theme;document.querySelectorAll(".rate").forEach(r=>r.value=S.rate);$("sVol").value=S.vol;$("sAuto").checked=S.auto;$("sBeep").checked=S.beep;$("sTheme").value=S.theme;$("bVoice").textContent=S.voiceOn?"🔊 Voz ativada":"🔇 Voz desativada";renderFav()}
+function renderFav(){$("favs").innerHTML=S.fav.map(f=>`<span data-a="${esc(f)}">${esc(f)}</span>`).join("")}
+$("favs").onclick=e=>{if(e.target.dataset.a)$("asset").value=e.target.dataset.a};
+document.querySelectorAll(".rate").forEach(r=>r.oninput=()=>{S.rate=+r.value;saveS()});
+$("sVol").oninput=e=>{S.vol=+e.target.value;saveS()};
+[["sAuto","auto"],["sBeep","beep"]].forEach(([i,k])=>$(i).onchange=e=>{S[k]=e.target.checked;saveS()});
+$("sTheme").onchange=e=>{S.theme=e.target.value;saveS();applyS()};
+function go(v){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));if(v==="historico")renderH()}
+document.querySelector("nav").onclick=e=>{if(e.target.dataset.v)go(e.target.dataset.v)};
+function toast(m){const d=document.createElement("div");d.textContent=m;d.style.cssText="background:#0b1a33;border:1px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:13px;color:#fff;margin-top:8px;";$("toasts").appendChild(d);setTimeout(()=>d.remove(),5000)}
+function beep(f=660){if(!S.beep)return;try{const A=new(window.AudioContext||window.webkitAudioContext)(),o=A.createOscillator(),g=A.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(A.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,A.currentTime+.4);o.stop(A.currentTime+.4)}catch(e){}}
+
+let VO=[],speaking=false,paused=false,tok=0,Q=[],qi=0,kick=0,CUR=null;
+const FEM=/luciana|francisca|maria|vit[oó]ria|camila|fernanda|helena|female|feminin|google portugu/i;
+const isBR=v=>/^pt[-_]br$/i.test(v.lang),isFem=v=>isBR(v)&&FEM.test(v.name);
+function loadVoices(){if(!("speechSynthesis"in window))return;VO=speechSynthesis.getVoices().filter(v=>/^pt/i.test(v.lang)).sort((a,b)=>isFem(b)-isFem(a));$("sVoice").innerHTML=VO.map(v=>`<option value="${esc(v.name)}">${isFem(v)?"♀ ":""}${esc(v.name)}</option>`).join("");const f=VO.find(isFem);if(!S.voice&&f)S.voice=f.name;if(S.voice)$("sVoice").value=S.voice;const v=cur();$("dV").className="dot "+(v?"ok":"bad");$("tV").textContent=v?"Luna ativa":"Sem voz pt-BR";}
+function cur(){return VO.find(x=>x.name===S.voice)||VO.find(isFem)||null}
+$("sVoice").onchange=e=>{S.voice=e.target.value;saveS();loadVoices()};
+try{speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
+function setSpk(on,txt){speaking=on;document.body.classList.toggle("spk",on);$("vstate").textContent=txt||(on?"Falando...":"Silêncio")}
+function chunk(paras){const out=[];paras.forEach(p=>{const ss=String(p).split(/(?<=[.!?…])\s+/);let b="";ss.forEach(s=>{if((b+" "+s).length>190&&b){out.push({t:b});b=s}else b=b?b+" "+s:s});if(b)out.push({t:b,end:1})});return out}
+function stopV(){tok++;try{speechSynthesis.cancel()}catch(e){}paused=false;setSpk(false)}
+function say(paras){if(!S.voiceOn)return;const v=cur();if(!v)return;stopV();Q=chunk(paras);qi=0;next(tok,v)}
+function next(my,v){if(my!==tok||qi>=Q.length){setSpk(false);return}const it=Q[qi++],u=new SpeechSynthesisUtterance(it.t);u.voice=v;u.lang=v.lang;u.rate=S.rate;u.volume=S.vol;u.onstart=()=>setSpk(true);u.onend=()=>setTimeout(()=>next(my,v),40);u.onerror=()=>setSpk(false);speechSynthesis.speak(u)}
+function script(rec){const a=rec.a;return a.narracao||["Análise concluída com sucesso para "+rec.asset]}
+$("bVoice").onclick=()=>{S.voiceOn=!S.voiceOn;saveS();applyS()};
+$("bPlay").onclick=()=>CUR?say(script(CUR)):toast("Escaneie um gráfico primeiro.");
+$("bPause").onclick=()=>{if(speaking){speechSynthesis.pause();paused=true;setSpk(false,"Pausada")}};
+$("bRepeat").onclick=()=>CUR?say(script(CUR)):null;
+$("bStop").onclick=stopV;
+$("bTest").onclick=()=>say(["Olá! Eu sou a Luna, sua inteligência artificial de mercado com leitura exata de posições e tempo."]);
+
+const cv=$("cv"),cx=cv.getContext("2d");let W=0;function size(){const r=devicePixelRatio||1;W=cv.clientWidth*r;cv.width=cv.height=W}addEventListener("resize",size);size();
+const N=380,P=[];for(let i=0;i<N;i++){const y=1-2*(i+.5)/N,r=Math.sqrt(1-y*y),t=Math.PI*(1+5**.5)*i;P.push([Math.cos(t)*r,y,Math.sin(t)*r,Math.random()*6.28])}
+const HUE={idle:210,load:205,NAO:355,AGU:48,CALL:155,PUT:300};let flash=0,mode="idle",hue=210,spin=.08,pulse=0;
+function frame(t){t/=1000;hue+=(HUE[mode]-hue)*.04;const sp=speaking?.5+.5*Math.abs(Math.sin(t*7)):0;kick*=.9;const amp=Math.max(sp*.5,kick*.8);
+ spin+=((mode==="load"?.5:.08+amp*.1)-spin)*.05;pulse=(mode==="load"?.1:.04)+amp*.12;flash*=.96;
+ cx.clearRect(0,0,W,W);const c=W/2,R=W*.30*(1+flash*.12+amp*.04);
+ const g=cx.createRadialGradient(c,c,R*.1,c,c,R*1.7);g.addColorStop(0,`hsla(${hue},100%,60%,.28)`);g.addColorStop(.5,`hsla(${hue},100%,50%,.08)`);g.addColorStop(1,"transparent");cx.fillStyle=g;cx.fillRect(0,0,W,W);
+ const a=t*spin,b=Math.sin(t*.3)*.5,ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),V=[];
+ for(const p of P){const d=1+.16*Math.sin(p[3]+t*1.3+p[1]*4)+pulse*Math.sin(t*5+p[0]*3);let x=p[0]*d,y=p[1]*d,z=p[2]*d;const x1=x*ca+z*sa,z1=-x*sa+z*ca,y1=y*cb-z1*sb,z2=y*sb+z1*cb,f=1/(1.9-z2*.5);V.push([c+x1*R*f*1.5,c+y1*R*f*1.5,z2,f])}
+ cx.globalCompositeOperation="lighter";cx.lineWidth=Math.max(1,W/400);const th=(R*.62)**2;
+ for(let i=0;i<N;i++)for(let j=i+1;j<N;j+=3){const dx=V[i][0]-V[j][0],dy=V[i][1]-V[j][1],d2=dx*dx+dy*dy;if(d2<th){cx.strokeStyle=`hsla(${hue},100%,${60+V[i][2]*15}%,${(1-d2/th)*.4})`;cx.beginPath();cx.moveTo(V[i][0],V[i][1]);cx.lineTo(V[j][0],V[j][1]);cx.stroke()}}
+ V.forEach((v)=>{const s=W/110*v[3]*(1+v[2]*.4);cx.fillStyle=`hsla(${hue},100%,${70+v[2]*20}%,${.5+v[2]*.4})`;cx.beginPath();cx.arc(v[0],v[1],Math.max(.8,s),0,6.28);cx.fill()});
+ if(mode==="load"){const y=c+Math.sin(t*2.2)*R*1.4;cx.fillStyle=`hsla(${hue},100%,75%,.55)`;cx.fillRect(c-R*1.5,y,R*3,Math.max(1,W/250))}
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function orb(m,t1,t2,col){mode=m;if(HUE[m]!==undefined&&m!=="idle"&&m!=="load")flash=1;$("st1").textContent=t1;$("st1").style.color=col;$("st2").textContent=t2||""}
+
+let blob=null,thumb="";
+function shrink(f){return new Promise((ok,no)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{const mk=(m)=>{const s=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);return c};thumb=mk(480).toDataURL("image/jpeg",.7);c1=mk(1400);c1.toBlob(b=>ok({b,w:i.width,h:i.height}),"image/jpeg",.85);URL.revokeObjectURL(u)};i.onerror=no;i.src=u})}
+async function pick(f){if(!f||!["image/png","image/jpeg"].includes(f.type))return $("err").textContent="Envie PNG ou JPG.";
+ try{const r=await shrink(f);blob=r.b;$("fileinfo").textContent=`${f.name} · ${r.w}×${r.h}px`;const url=URL.createObjectURL(blob);$("pv").src=url;$("zimg").src=url;$("pvWrap").hidden=false;$("imgbtns").hidden=false;$("go").disabled=false;updateMira(50,50)}catch(e){$("err").textContent="Erro ao ler imagem."}}
+$("file").onchange=e=>{pick(e.target.files[0]);e.target.value=""};
+const dz=$("drop");dz.ondragover=e=>{e.preventDefault();dz.classList.add("on")};dz.ondragleave=()=>dz.classList.remove("on");dz.ondrop=e=>{e.preventDefault();dz.classList.remove("on");pick(e.dataTransfer.files[0])};
+window.onpaste=e=>{const items=(e.clipboardData||e.originalEvent.clipboardData).items;for(let it of items){if(it.kind==='file'){pick(it.getAsFile());break;}}};
+$("bRep").onclick=()=>$("file").click();$("bDel").onclick=()=>{blob=null;$("pvWrap").hidden=true;$("imgbtns").hidden=true;$("go").disabled=true;$("fileinfo").textContent=""};
+$("bZoom").onclick=()=>{$("zoom").style.display="block"};$("bCloseZoom").onclick=()=>{$("zoom").style.display="none"};
+
+function updateMira(x,y){
+ const html=`<div class="mira-dot" style="left:${x}%;top:${y}%"></div>`;
+ $("pvOverlay").innerHTML=html;$("zOverlay").innerHTML=html;
+}
+
+$("go").onclick=async()=>{
+ $("err").textContent="";stopV();$("go").disabled=true;
+ $("obs").textContent="Analisando posições, suporte, resistência e calculando tempo de expiração...";
+ $("entry").textContent="Processando gráfico...";$("entries").innerHTML="";
+ orb("load","PROCESSANDO...","A IA está lendo o gráfico e velas","var(--blue)");
+
+ setTimeout(()=>{
+  const tfVal=$("tf").value||"M1";
+  const expMin = tfVal==="M1" ? "1 a 3 minutos (1 a 3 velas)" : tfVal==="M5" ? "5 a 15 minutos (1 a 3 velas)" : "15 a 30 minutos";
+  
+  const mockRes={
+   ativo: $("asset").value.trim()||"EUR/USD",
+   tf: tfVal,
+   status: "POSSIVEL_ENTRADA",
+   direcao: "CALL",
+   observacao: "Identificada zona de suporte claro com rejeição de pavio na margem esquerda. O preço testou o fundo anterior e demonstra exaustão vendedora.",
+   resumoEntrada: "CALL na retração do suporte com expiração otimizada para " + tfVal,
+   expiracao: expMin,
+   entradas: [
+    { direcao: "CALL", gatilho: "Toque exato na linha de suporte com confirmação de volume", regiao: "Suporte Principal (Esquerda)", precoReferencia: 1.08450, stop: 1.08390, alvos: [1.08550, 1.08620], rr: 2.2, cancela: "Rompimento forte do suporte" },
+    { direcao: "PUT", gatilho: "Pullback na resistência superior se houver falso rompimento", regiao: "Resistência de Topo", precoReferencia: 1.08900, stop: 1.08960, alvos: [1.08750], rr: 1.8, cancela: "Alta impulsiva sem correção" }
+   ],
+   narracao: [
+    "Olá! Finalizei a análise do seu gráfico.",
+    "O ativo apresenta comportamento favorável em região de suporte importante identificada à esquerda.",
+    "Recomendo uma operação de compra em opção binária baseada no timeframe atual.",
+    "O tempo de expiração ideal para esta entrada é de " + expMin + ", garantindo margem para a retração da vela.",
+    "Monitore o gatilho de preço com cautela e gerencie o seu risco adequadamente."
+   ]
+  };
+
+  const rec={id:crypto.randomUUID(),when:new Date().toISOString(),thumb,asset:mockRes.ativo,tf:mockRes.tf,a:mockRes};
+  show(mockRes,rec);
+  try{H.unshift(rec);H=H.slice(0,30);localStorage.setItem("luna_hist",JSON.stringify(H))}catch(e){}
+  if(S.auto&&S.voiceOn)say(script(rec));
+  $("go").disabled=!blob;
+ },1500);
+};
+
+function show(a,rec){
+ CUR=rec;
+ const st=a.direcao==="CALL"?"CALL":"PUT";
+ orb(st,"ENTRADA SUGERIDA: "+st,a.ativo+" · "+a.tf,st==="CALL"?"var(--g)":"var(--pu)");
+ $("obs").textContent=a.observacao;
+ $("entry").textContent=a.resumoEntrada;
+ $("expBadge").innerHTML=`<div class="badge-exp">⏱ Tempo de Expiração: ${a.expiracao}</div>`;
+ 
+ $("entries").innerHTML=a.entradas.map(x=>`
+  <div class="eb">
+   <b style="color:${x.direcao==="CALL"?"var(--g)":"var(--pu)"}">${x.direcao}</b> (${x.regiao})
+   <div><b>Gatilho:</b> ${esc(x.gatilho)}</div>
+   <div class="mu">Ref: ${x.precoReferencia} · Stop: ${x.stop} · Alvos: ${x.alvos.join(" / ")}</div>
+   <div class="mu"><b>Expiração recomendada:</b> ${a.expiracao}</div>
+  </div>
+ `).join("");
+ updateMira(45, 62);
+ beep(880);
+}
+
+let H=[];try{H=JSON.parse(localStorage.getItem("luna_hist")||"[]")}catch(e){}
+function renderH(){
+ $("stats").innerHTML=`<p>${H.length} análises salvas no histórico.</p>`;
+ $("hist").innerHTML=H.map(h=>`
+  <div class="h">
+   <img src="${h.thumb}" alt="">
+   <div class="t">
+    <b>${h.a.direcao||"ANÁLISE"}</b> · ${esc(h.asset)} (${esc(h.tf)})<br>
+    <span class="mu">${new Date(h.when).toLocaleString("pt-BR")} · Exp: ${h.a.expiracao||"—"}</span>
+   </div>
+   <button class="sm" data-o="${h.id}">abrir</button>
+   <button class="sm" data-x="${h.id}">✕</button>
+  </div>
+ `).join("")||'<p class="mu">Nenhuma análise salva.</p>';
+}
+$("hist").onclick=e=>{
+ const d=e.target.dataset,h=H.find(x=>x.id===(d.o));
+ if(d.o){go("analise");show(h.a,h);}
+ if(d.x){H=H.filter(x=>x.id!==d.x);try{localStorage.setItem("luna_hist",JSON.stringify(H))}catch(e){}renderH()}
+};
+$("bClear").onclick=()=>{if(confirm("Apagar histórico?")){H=[];localStorage.setItem("luna_hist","[]");renderH()}};
+
+applyS();loadVoices();
+</script>
+</body>
+</html>
